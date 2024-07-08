@@ -52,14 +52,13 @@ export const updateTodo = async (todoId, todoData) => {
         throw error;
     }
 };
-export const updateTodoStatus = async (todoId, todoData) => {
+export const updateTodoStatus = async (todoId) => {
     try {
         const response = await fetch(`${API_BASE_URL}/todo/${todoId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(todoData)
         });
         if (!response.ok) {
             throw new Error('Failed to update todo status');

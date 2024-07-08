@@ -26,7 +26,8 @@ const TodoForm = () => {
                 onChange={(e) => setTitle(e.target.value)}
                 required
             />
-            <textarea
+            <input
+                type="text"
                 placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
