@@ -9,11 +9,11 @@ function App() {
   // console.log(allDummyTodos.allTodos)
   const [todos, setTodos] = useState([])
 
-  fetch("http://localhost:3001/any/todos")
-  .then(async (res) => {
-    const jsonResponse = await res.json()
-    setTodos(jsonResponse.allTodos)
-  })
+  // fetch("http://localhost:3001/any/todos")
+  // .then(async (res) => {
+  //   const jsonResponse = await res.json()
+  //   setTodos(jsonResponse.allTodos)
+  // })
 
   return (
     <div>

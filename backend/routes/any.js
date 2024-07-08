@@ -1,92 +1,165 @@
 const { Router } = require("express");
 const { createTodo, updateTodo } = require("../utils/types.js");
-const { Todos } = require("../database/db.js");
+const { Todos} = require("../database/db.js");
+const mongoose = require("mongoose");
 
-const router = Router()
 
+const router = Router();
 
+// Create a new todo
 router.post("/todo", async (req, res) => {
     const createPayload = req.body;
     const parsedPayload = createTodo.safeParse(createPayload);
 
-    if(!parsedPayload.success){
-        return res.status(411).json({
+    if (!parsedPayload.success) {
+        return res.status(400).json({
             msg: "Input format is incorrect"
-        })
-    }else{
-        // put new todo in mongodb
+        });
+    } else {
         try {
-            const {title, description} = createPayload;
+            const { title, description } = createPayload;
             const newTodo = await Todos.create({
                 title,
                 description,
                 completed: false
-            })
+            });
             return res.status(201).json({
-                msg: "todo created successfully",
+                msg: "Todo created successfully",
                 newTodo
-            })
+            });
         } catch (error) {
             return res.status(500).json({
-                msg: "failed to create new todo at the moment",
-                error
-            })
+                msg: "Failed to create new todo at the moment",
+                error: error.message
+            });
         }
     }
-})
+});
 
+// Get all todos
 router.get('/todos', async (req, res) => {
     try {
-        const allTodos = await Todos.find({})
-        
+        const allTodos = await Todos.find({});
         return res.json({
             allTodos
-        })
+        });
     } catch (error) {
         return res.status(500).json({
-            msg: "failed to retrive Todos at the moment",
-            error
-        })
+            msg: "Failed to retrieve todos at the moment",
+            error: error.message
+        });
     }
-})
+});
+
+// Toggle the status for todo
+router.patch("/todo/:id", async (req, res) => {
+    const { id } = req.params;
+
+    // Check if id is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            msg: "id format is invalid"
+        });
+    }
+
+    try {
+        const todo = await Todos.findById(id);
+
+        if (!todo) {
+            return res.status(404).json({
+                msg: "Todo not found"
+            });
+        }
+
+        // Toggle the completed status
+        todo.completed = !todo.completed;
+        await todo.save();
+
+        return res.json({
+            msg: `Todo status toggled successfully`,
+            updatedTodo: todo
+        });
+    } catch (error) {
+
+        return res.status(500).json({
+            msg: "Failed to toggle todo status",
+            error: error.message
+        });
+    }
+});
 
 
-router.patch("/completed", async (req, res) => {
-    const createPayload = req.body;
-    const parsedPayload = updateTodo.safeParse(createPayload);
 
-    if(!parsedPayload.success){
-        return res.status(411).json({
+// Edit a todo
+router.put("/todo/:id", async (req, res) => {
+    const { id } = req.params;
+    const updatePayload = req.body;
+    const parsedPayload = updateTodo.safeParse(updatePayload);
+
+    if (!parsedPayload.success) {
+        return res.status(400).json({
             msg: "Input format is incorrect"
-        })
-    }else{
-        // search and update in mongodb by _id
-        try {
-            const {_id } = createPayload;
-            const updatedTodo = await Todos.findByIdAndUpdate(
-                _id ,
-                { completed: true },
-                // { new: false}
-            )
-            if(updatedTodo){
-                return res.json({
-                    msg: "todo marked as completed"
-                })
-            }else{
-                return res.status(404).json({
-                    msg: "unable to find the todo with the given _id",
-                })
-            }
+        });
+    } else {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                msg: "id format is invalid"
+            });
+        }
 
+        try {
+            const updatedTodo = await Todos.findByIdAndUpdate(
+                id,
+                updatePayload,
+                { new: true }
+            );
+            if (updatedTodo) {
+                return res.json({
+                    msg: "Todo updated successfully",
+                    updatedTodo
+                });
+            } else {
+                return res.status(404).json({
+                    msg: "Todo not found",
+                });
+            }
         } catch (error) {
             return res.status(500).json({
-                msg: "unable to update the todo status at the moment",
-                error
-            })
+                msg: "Unable to update the todo at the moment",
+                error: error.message
+            });
         }
     }
-})
+});
 
+// Delete a todo
+router.delete("/todo/:id", async (req, res) => {
+    const { id } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            msg: "id format is invalid"
+        });
+    }
+
+    try {
+        const deletedTodo = await Todos.findByIdAndDelete(id);
+        if (deletedTodo) {
+            return res.json({
+                msg: "Todo deleted successfully",
+                deletedTodo
+            });
+        } else {
+            return res.status(404).json({
+                msg: "Todo not found",
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Unable to delete the todo at the moment",
+            error: error.message
+        });
+    }
+});
 
 module.exports = router;

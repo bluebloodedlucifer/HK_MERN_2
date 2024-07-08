@@ -6,10 +6,12 @@ const createTodo = zod.object({
 });
 
 const updateTodo = zod.object({
-    _id: zod.string(),
+    title: zod.string(),
+    description: zod.string(),
 });
+
 
 module.exports = {
     createTodo: createTodo,
-    updateTodo: updateTodo
+    updateTodo: updateTodo,
 }
