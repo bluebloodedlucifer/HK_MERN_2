@@ -1,6 +1,6 @@
-// src/api/todoApi.js
+
 const PORT = 3001;
-const API_BASE_URL = `http://localhost:${PORT}/any`; // Replace with your backend URL
+const API_BASE_URL = `http://localhost:${PORT}/any`; 
 
 export const getAllTodos = async () => {
     try {
