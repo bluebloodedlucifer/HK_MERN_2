@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { getAllTodos } from '../api/todoApi';
 import TodoItem from './TodoItem';
 
-const TodoList = () => {
-    const [todos, setTodos] = useState([]);
+const TodoList = ({todos, setTodos}) => {
+    // const [todos, setTodos] = useState([]);
 
     useEffect(() => {
         const fetchTodos = async () => {
@@ -16,14 +16,14 @@ const TodoList = () => {
         };
 
         fetchTodos();
-    }, [todos]);
+    }, []);
 
     return (
         <div>
             <h2>Todo List</h2>
             <ul>
                 {todos.map(todo => (
-                    <TodoItem key={todo._id} todo={todo} />
+                    <TodoItem key={todo._id} todo={todo} todos = {todos} setTodos = {setTodos}/>
                 ))}
             </ul>
         </div>

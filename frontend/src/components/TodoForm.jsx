@@ -1,17 +1,22 @@
-import { useState } from 'react';
-import { createTodo } from '../api/todoApi';
+import { useRef } from 'react';
+import { createTodo, updateTodo } from '../api/todoApi';
 
-const TodoForm = () => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+const TodoForm = ({todos, setTodos}) => {
+
+    const titleRef = useRef('')
+    const descriptionRef = useRef('')
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const newTodo = await createTodo({ title, description });
+            const title = titleRef.current.value;
+            const description = descriptionRef.current.value
+
+            const { newTodo } = await createTodo({ title, description });
+            console.log(newTodo)
             console.log('Todo created successfully:', newTodo);
-            setTitle('');
-            setDescription('');
+
+            setTodos([...todos, newTodo])
         } catch (error) {
             console.error('Error creating todo:', error);
         }
@@ -22,15 +27,13 @@ const TodoForm = () => {
             <input
                 type="text"
                 placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                ref={titleRef}
                 required
             />
             <input
                 type="text"
                 placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                ref={descriptionRef}
             />
             <button type="submit">Add Todo</button>
         </form>

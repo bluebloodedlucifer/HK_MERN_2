@@ -78,7 +78,7 @@ export const deleteTodo = async (todoId) => {
         if (!response.ok) {
             throw new Error('Failed to delete todo');
         }
-        return true;
+        return await response.json();
     } catch (error) {
         console.error(`Error deleting todo with ID ${todoId}:`, error);
         throw error;

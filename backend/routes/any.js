@@ -145,6 +145,7 @@ router.delete("/todo/:id", async (req, res) => {
     try {
         const deletedTodo = await Todos.findByIdAndDelete(id);
         if (deletedTodo) {
+            // console.log(deletedTodo)
             return res.json({
                 msg: "Todo deleted successfully",
                 deletedTodo
